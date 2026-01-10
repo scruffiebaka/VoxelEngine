@@ -1,0 +1,57 @@
+using OpenTK.Graphics.OpenGL4;
+using OpenTK.Windowing.Common;
+using OpenTK.Windowing.Desktop;
+using OpenTK.Windowing.GraphicsLibraryFramework;
+using OpenTK.Mathematics;
+
+using VoxelEngine.Graphics;
+using VoxelEngine.World.Blocks;
+using VoxelEngine.Graphics.Rendering;
+using VoxelEngine.Core;
+
+namespace VoxelEngine
+{
+    public class Window : GameWindow
+    {
+        public Window(int width, int height, string Title) : base(GameWindowSettings.Default,
+            new NativeWindowSettings() { Title = Title, ClientSize = new Vector2i(width, height), MaximumClientSize = new Vector2i(width, height) })
+        {
+            CenterWindow();
+        }
+
+        private Game game;
+
+        protected override void OnLoad()
+        {
+            base.OnLoad();
+
+            GL.LoadBindings(new GLFWBindingsContext());
+            GL.ClearColor(new Color4(0.53f, 0.81f, 0.92f, 1.0f));
+            GL.Enable(EnableCap.DepthTest);
+
+            game = new Game(Size.X, Size.Y);
+            game.Load();
+        }
+        protected override void OnRenderFrame(FrameEventArgs args)
+        {
+            base.OnRenderFrame(args);
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+
+            game.Render(args);
+
+            SwapBuffers();
+        }
+
+        protected override void OnUpdateFrame(FrameEventArgs args)
+        {
+            base.OnUpdateFrame(args);
+
+            game.Update(args, KeyboardState, MouseState);
+        }
+
+        protected override void OnUnload()
+        {
+            base.OnUnload();
+        }
+    }
+}
