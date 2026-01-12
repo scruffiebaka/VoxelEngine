@@ -10,7 +10,8 @@ namespace VoxelEngine
 {
     public class Window : GameWindow
     {
-        private Game game;
+        private Game? game;
+
         public Window(int width, int height, string Title) : base(GameWindowSettings.Default,
             new NativeWindowSettings() { Title = Title, ClientSize = new Vector2i(width, height), MaximumClientSize = new Vector2i(width, height) })
         {
@@ -33,7 +34,8 @@ namespace VoxelEngine
             base.OnRenderFrame(args);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            game.Render(args);
+            if (game != null)
+                game.Render(args);
 
             SwapBuffers();
         }
@@ -42,7 +44,8 @@ namespace VoxelEngine
         {
             base.OnUpdateFrame(args);
 
-            game.Update(args, KeyboardState, MouseState);
+            if (game != null)
+                game.Update(args, KeyboardState, MouseState);
         }
 
         protected override void OnUnload()

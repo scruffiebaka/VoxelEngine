@@ -31,7 +31,7 @@ public static class ChunkMeshRenderer
         new( 0, -1,  0), //Bottom
     };
 
-    static bool IsAir(Chunk chunk, int x, int y, int z)
+    public static bool IsAir(Chunk chunk, int x, int y, int z)
     {
         if (x < 0 || y < 0 || z < 0 ||
             x >= Chunk.size || y >= Chunk.size || z >= Chunk.size)
