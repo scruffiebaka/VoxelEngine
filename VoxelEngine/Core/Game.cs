@@ -23,7 +23,6 @@ public class Game
     public Game(int width, int height, Window window)
     {
         camera = new Camera(Vector3.UnitZ * 3, width / (float)height);
-        player = new Player(camera);
         this.window = window;
     }
 
@@ -49,7 +48,7 @@ public class Game
                         block.id = (byte)BlockId.Stone;
                     else if (y <= 8)
                         block.id = (byte)BlockId.Dirt;
-                    else if (y <= 10)
+                    else if (y <= 9)
                         block.id = (byte)BlockId.Grass;
                     else
                         block.id = (byte)BlockId.Air;
@@ -63,6 +62,13 @@ public class Game
         TextureRegistry.RegisterBlocksTextures();
 
         chunkMesh = ChunkMeshRenderer.GenerateChunkMesh(testchunk, shader);
+
+        testchunk.OnBlockChanged += () =>
+        {
+            chunkMesh = ChunkMeshRenderer.GenerateChunkMesh(testchunk, shader);
+        };
+
+        player = new Player(camera);
     }
 
     public void Render(FrameEventArgs args)

@@ -16,10 +16,6 @@ public class Player
     Vector3 position;
     Vector3 velocity;
 
-    static readonly Vector3 PlayerSize = new Vector3(0.6f, 1.8f, 0.6f);
-    Vector3 Min(Vector3 pos) => pos - new Vector3(PlayerSize.X / 2f, 0f, PlayerSize.Z / 2f);
-    Vector3 Max(Vector3 pos) => pos + new Vector3(PlayerSize.X / 2f, PlayerSize.Y, PlayerSize.Z / 2f);
-
     float gravity = -9.8f;
 
     bool _firstMove = true;
@@ -46,6 +42,20 @@ public class Player
 
         velocity.Y += gravity * (float)args.Time;
         MoveAndCollide((float)args.Time);
+
+        PlayerPhysics.BlockRaycastHit? block = PlayerPhysics.RaycastBlocks(camera.Position, camera.Front, 8, chunk);
+        if (block != null)
+        {
+            if (mouse.IsButtonPressed(MouseButton.Left))
+            {
+                chunk.DestroyBlock(block.Value.Position.X, block.Value.Position.Y, block.Value.Position.Z);
+            }
+            if (mouse.IsButtonPressed(MouseButton.Right))
+            {
+                Vector3i placePos = block.Value.Position + block.Value.Normal;
+                chunk.CreateBlock(placePos.X, placePos.Y, placePos.Z, BlockId.Dirt);
+            }
+        }
     }
 
     private void PlayerMovement(KeyboardState Input)
@@ -91,20 +101,14 @@ public class Player
         }
     }
 
-    bool Intersects(Vector3 minA, Vector3 maxA, Vector3 minB, Vector3 maxB)
-    {
-        return minA.X < maxB.X && maxA.X > minB.X &&
-               minA.Y < maxB.Y && maxA.Y > minB.Y &&
-               minA.Z < maxB.Z && maxA.Z > minB.Z;
-    }
     void MoveAndCollide(float dt)
     {
         position.X += velocity.X * dt;
-        if (Collides())
+        if (PlayerPhysics.Collides(position, chunk))
             position.X -= velocity.X * dt;
 
         position.Y += velocity.Y * dt;
-        if (Collides())
+        if (PlayerPhysics.Collides(position, chunk))
         {
             if (velocity.Y < 0)
                 isGrounded = true;
@@ -118,29 +122,7 @@ public class Player
         }
 
         position.Z += velocity.Z * dt;
-        if (Collides())
+        if (PlayerPhysics.Collides(position, chunk))
             position.Z -= velocity.Z * dt;
-    }
-
-    bool Collides()
-    {
-        Vector3 min = Min(position);
-        Vector3 max = Max(position);
-
-        for (int x = (int)MathF.Floor(min.X); x <= MathF.Floor(max.X); x++)
-            for (int y = (int)MathF.Floor(min.Y); y <= MathF.Floor(max.Y); y++)
-                for (int z = (int)MathF.Floor(min.Z); z <= MathF.Floor(max.Z); z++)
-                {
-                    if (!ChunkMeshRenderer.IsAir(chunk, x, y, z))
-                    {
-                        Vector3 bMin = new Vector3(x, y, z);
-                        Vector3 bMax = bMin + Vector3.One;
-
-                        if (Intersects(min, max, bMin, bMax))
-                            return true;
-                    }
-                }
-
-        return false;
     }
 }
