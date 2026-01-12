@@ -4,22 +4,18 @@ using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using OpenTK.Mathematics;
 
-using VoxelEngine.Graphics;
-using VoxelEngine.World.Blocks;
-using VoxelEngine.Graphics.Rendering;
 using VoxelEngine.Core;
 
 namespace VoxelEngine
 {
     public class Window : GameWindow
     {
+        private Game game;
         public Window(int width, int height, string Title) : base(GameWindowSettings.Default,
             new NativeWindowSettings() { Title = Title, ClientSize = new Vector2i(width, height), MaximumClientSize = new Vector2i(width, height) })
         {
             CenterWindow();
         }
-
-        private Game game;
 
         protected override void OnLoad()
         {
@@ -29,7 +25,7 @@ namespace VoxelEngine
             GL.ClearColor(new Color4(0.53f, 0.81f, 0.92f, 1.0f));
             GL.Enable(EnableCap.DepthTest);
 
-            game = new Game(Size.X, Size.Y);
+            game = new Game(Size.X, Size.Y, this);
             game.Load();
         }
         protected override void OnRenderFrame(FrameEventArgs args)

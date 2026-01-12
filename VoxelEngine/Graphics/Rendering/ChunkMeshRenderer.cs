@@ -1,6 +1,6 @@
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
-
+using VoxelEngine.Graphics.Textures;
 using VoxelEngine.World.Blocks;
 
 namespace VoxelEngine.Graphics.Rendering;
@@ -35,7 +35,7 @@ public static class ChunkMeshRenderer
     {
         if (x < 0 || y < 0 || z < 0 ||
             x >= Chunk.size || y >= Chunk.size || z >= Chunk.size)
-            return true; // outside chunk = air
+            return true;
 
         int index = x + Chunk.size * (y + Chunk.size * z);
         return chunk.blocks[index].id == (byte)BlockId.Air;
@@ -56,6 +56,17 @@ public static class ChunkMeshRenderer
             int y = (i / Chunk.size) % Chunk.size;
             int z = i / (Chunk.size * Chunk.size);
 
+            BlockTexture texture, value;
+            if (TextureRegistry.blocktextures.TryGetValue((BlockId)chunk.blocks[i].id, out value))
+            {
+                texture = value;
+            }
+            else
+            {
+                //handle no texture
+                texture = TextureRegistry.blocktextures[BlockId.Dirt];
+            }
+
             for (int face = 0; face < 6; face++)
             {
                 Vector3i d = Directions[face];
@@ -65,11 +76,12 @@ public static class ChunkMeshRenderer
 
                 for (int v = 0; v < 4; v++)
                 {
+
                     vertices.Add(new Vertex
                     {
                         Position = new Vector3(x, y, z) + BlockModels.FaceVertices[face][v],
                         Normal = BlockModels.FaceNormals[face],
-                        TexCoord = BlockModels.FaceUVs[v]
+                        TexCoord = texture.faces[face].uvs[v]
                     });
                 }
 

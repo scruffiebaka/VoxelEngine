@@ -1,4 +1,4 @@
 ﻿using VoxelEngine;
 
-Window window = new Window(1280, 720, "VoxelEngine");
+Window window = new Window(800, 640, "VoxelEngine");
 window.Run();
