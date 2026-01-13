@@ -7,18 +7,29 @@ namespace VoxelEngine.Graphics.Rendering;
 
 public static class ChunkMeshRenderer
 {
-    public static void Draw(Vector3 position, ChunkMesh mesh, Shader shader)
+    public static Shader shader;
+
+    public static void DrawChunk(Chunk chunk)
     {
-        shader.Use();
+        if (chunk.mesh != null)
+        {
+            Vector3 worldPos = new Vector3(
+                chunk.chunkPosition.X * Chunk.sizeXZ,
+                0,
+                chunk.chunkPosition.Y * Chunk.sizeXZ
+            );
 
-        shader.SetMatrix4("model",
-                Matrix4.CreateScale(Vector3.One)
-                * Matrix4.CreateFromQuaternion(Quaternion.Identity)
-                * Matrix4.CreateTranslation(position));
+            shader.Use();
 
-        GL.BindVertexArray(mesh.VertexArrayObject);
-        GL.DrawElements(PrimitiveType.Triangles, mesh.indices.Length, DrawElementsType.UnsignedInt, 0);
-        GL.BindVertexArray(0);
+            shader.SetMatrix4("model",
+                    Matrix4.CreateScale(Vector3.One)
+                    * Matrix4.CreateFromQuaternion(Quaternion.Identity)
+                    * Matrix4.CreateTranslation(worldPos));
+
+            GL.BindVertexArray(chunk.mesh.VertexArrayObject);
+            GL.DrawElements(PrimitiveType.Triangles, chunk.mesh.indices.Length, DrawElementsType.UnsignedInt, 0);
+            GL.BindVertexArray(0);
+        }
     }
 
     static readonly Vector3i[] Directions =
@@ -34,14 +45,14 @@ public static class ChunkMeshRenderer
     public static bool IsAir(Chunk chunk, int x, int y, int z)
     {
         if (x < 0 || y < 0 || z < 0 ||
-            x >= Chunk.size || y >= Chunk.size || z >= Chunk.size)
+            x >= Chunk.sizeXZ || y >= Chunk.sizeY || z >= Chunk.sizeXZ)
             return true;
 
-        int index = x + Chunk.size * (y + Chunk.size * z);
+        int index = x + Chunk.sizeXZ * (y + Chunk.sizeY * z);
         return chunk.blocks[index].id == (byte)BlockId.Air;
     }
 
-    public static ChunkMesh GenerateChunkMesh(Chunk chunk, Shader shader)
+    public static ChunkMesh GenerateChunkMesh(Chunk chunk)
     {
         List<Vertex> vertices = new();
         List<uint> indices = new();
@@ -52,9 +63,9 @@ public static class ChunkMeshRenderer
             if (chunk.blocks[i].id == (byte)BlockId.Air)
                 continue;
 
-            int x = i % Chunk.size;
-            int y = (i / Chunk.size) % Chunk.size;
-            int z = i / (Chunk.size * Chunk.size);
+            int x = i % Chunk.sizeXZ;
+            int y = (i / Chunk.sizeXZ) % Chunk.sizeY;
+            int z = i / (Chunk.sizeXZ * Chunk.sizeY);
 
             BlockTexture texture, value;
             if (TextureRegistry.blocktextures.TryGetValue((BlockId)chunk.blocks[i].id, out value))

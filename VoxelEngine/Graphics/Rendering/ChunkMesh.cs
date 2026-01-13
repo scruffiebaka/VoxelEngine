@@ -5,6 +5,7 @@ using OpenTK.Mathematics;
 
 namespace VoxelEngine.Graphics.Rendering;
 
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct Vertex
 {
     public Vector3 Position;

@@ -5,6 +5,7 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 using OpenTK.Mathematics;
 
 using VoxelEngine.Core;
+using VoxelEngine.Graphics;
 
 namespace VoxelEngine
 {
@@ -28,6 +29,9 @@ namespace VoxelEngine
 
             game = new Game(Size.X, Size.Y, this);
             game.Load();
+
+
+
         }
         protected override void OnRenderFrame(FrameEventArgs args)
         {

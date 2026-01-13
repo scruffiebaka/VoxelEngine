@@ -18,7 +18,7 @@ public static class PlayerPhysics
                minA.Z < maxB.Z && maxA.Z > minB.Z;
     }
 
-    public static bool Collides(Vector3 position, Chunk chunk)
+    public static bool Collides(Vector3 position, World.World world)
     {
         Vector3 min = Min(position);
         Vector3 max = Max(position);
@@ -27,7 +27,7 @@ public static class PlayerPhysics
             for (int y = (int)MathF.Floor(min.Y); y <= MathF.Floor(max.Y); y++)
                 for (int z = (int)MathF.Floor(min.Z); z <= MathF.Floor(max.Z); z++)
                 {
-                    if (!ChunkMeshRenderer.IsAir(chunk, x, y, z))
+                    if (World.World.isSolid(new Vector3i(x, y, z), world))
                     {
                         Vector3 bMin = new Vector3(x, y, z);
                         Vector3 bMax = bMin + Vector3.One;
@@ -50,7 +50,7 @@ public static class PlayerPhysics
         Vector3 origin,
         Vector3 direction,
         float maxDistance,
-        Chunk chunk
+        World.World world
     )
     {
         direction = direction.Normalized();
@@ -84,7 +84,7 @@ public static class PlayerPhysics
 
         while (t <= maxDistance)
         {
-            if (!ChunkMeshRenderer.IsAir(chunk, x, y, z))
+            if (World.World.isSolid(new Vector3i(x, y, z), world))
             {
                 return new BlockRaycastHit
                 {

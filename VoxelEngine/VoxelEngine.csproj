@@ -11,5 +11,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Core\" />
+    <Folder Include="Resources\Shaders\Selection\" />
   </ItemGroup>
 </Project>
